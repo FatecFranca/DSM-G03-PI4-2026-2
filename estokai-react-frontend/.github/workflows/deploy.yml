@@ -1,0 +1,50 @@
+name: Deploy frontend
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-frontend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configurar SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VM_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Publicar tag na VM
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          TAG_B64="$(printf '%s' "$TAG" | base64 -w 0)"
+          ssh -i ~/.ssh/id_ed25519 "$VM_USER@$VM_HOST" "TAG_B64=$TAG_B64 bash -s" <<'REMOTE'
+            set -Eeuo pipefail
+            TAG="$(printf '%s' "$TAG_B64" | base64 --decode)"
+
+            cd /opt/estokai/estokai-react-frontend
+            git fetch --force --tags origin
+            git checkout --detach "refs/tags/$TAG"
+
+            cd /opt/estokai/deploy
+            docker compose up -d --build --no-deps frontend
+            docker compose ps frontend
+          REMOTE

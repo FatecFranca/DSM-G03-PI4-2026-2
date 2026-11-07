@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: iot
+  main:
+    keep-alive: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:estokai}
+    password: ${RABBITMQ_PASSWORD:estokai}
+
+mqtt:
+  broker-url: ${MQTT_BROKER_URL:tcp://localhost:1883}
+  client-id: ${MQTT_CLIENT_ID:estokai-iot-service}
+  username: ${MQTT_USERNAME:}
+  password: ${MQTT_PASSWORD:}
+  topic: estokai/devices/+/telemetry/+
+  display-topic-template: estokai/devices/%s/commands/display
+  qos: 1
+
+rabbitmq:
+  telemetry:
+    exchange: estokai.telemetry
+    queue: estokai.application.telemetry
+    routing-key: telemetry.received
+
+logging:
+  level:
+    root: INFO
+    com.estokai.iot: INFO
+    org.springframework.integration.mqtt: DEBUG

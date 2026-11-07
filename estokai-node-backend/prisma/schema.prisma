@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  nome            String
+  email           String          @unique
+  senha           String
+  ativo           Boolean         @default(true)
+  admin           Boolean         @default(false)
+  horarioInicio   String          @default("08:00")
+  horarioFim      String          @default("18:00")
+  temperaturaVentilador Float     @default(30)
+  ventiladorLigado      Boolean   @default(false)
+  createdAt       DateTime        @default(now())
+
+  clientes        Cliente[]
+  pedidos         Pedido[]
+  produtos        Produto[]
+  fornecedores    Fornecedor[]
+  movimentacoes   Movimentacao[]
+  dispositivosPush DispositivoPush[]
+  dispositivosTelemetria DispositivoTelemetria[]
+  telemetrias     Telemetria[]
+
+  @@index([ativo])
+}
+
+model Cliente {
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  cnpj              Boolean
+  nomeRazaoSocial   String
+  cpfCnpj           String      
+  email             String?
+  createdAt          DateTime    @default(now())
+  logradouro        String
+  numImovel         String
+  complemento       String?
+  bairro            String?
+  municipio         String
+  uf                String
+  cep               String
+  celular1          String
+  celular2          String?
+
+  usuarioId         String      @db.ObjectId
+  usuario           Usuario     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  pedidos           Pedido[]
+
+  @@index([usuarioId])
+  @@index([cpfCnpj])
+  @@index([usuarioId, cpfCnpj])
+  @@index([createdAt])
+}
+
+model Pedido {
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+  numPedido         Int           
+  createdAt         DateTime      @default(now())
+  valorTotal        Float
+  desconto          Float         @default(0)
+  tipoDesconto      String?
+  formaPagamento    String
+  status            String
+  concluidoEm    DateTime?
+  usuarioId         String        @db.ObjectId
+  usuario           Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  clienteId         String        @db.ObjectId
+  cliente           Cliente       @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  itens             ItemPedido[]
+
+  @@index([usuarioId])
+  @@index([clienteId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([usuarioId, createdAt])
+  @@index([usuarioId, status])
+}
+
+model ItemPedido {
+  id                String         @id @default(auto()) @map("_id") @db.ObjectId
+  numItem           Int
+  quantidade        Int
+  valorUnitario     Float
+  valorTotal        Float
+
+  pedidoId          String         @db.ObjectId
+  pedido            Pedido         @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+
+  produtoId         String         @db.ObjectId
+  produto           Produto        @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  movimentacao      Movimentacao[]
+
+  @@index([pedidoId])
+  @@index([produtoId])
+}
+
+model Produto {
+  id                String               @id @default(auto()) @map("_id") @db.ObjectId
+  descricao         String
+  marca             String
+  codProduto        String?
+  imagemUrl         String?
+  detalhes          String?
+  precoCusto        Float
+  precoUnitario     Float
+  peso              Float?
+  balancaId         String?
+  qtdEstoque        Int                  @default(0)
+  qtdMinima         Int                  @default(10)
+  createdAt         DateTime             @default(now())
+
+  usuarioId         String               @db.ObjectId
+  usuario           Usuario              @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  itens             ItemPedido[]
+  movimentacoes     Movimentacao[]
+  fornecedores      ProdutoFornecedor[]
+
+  @@index([usuarioId])
+  @@index([descricao])
+  @@index([usuarioId, descricao])
+  @@index([qtdEstoque])
+  @@index([usuarioId, qtdEstoque])
+  @@index([usuarioId, balancaId])
+  @@index([createdAt])
+}
+
+model Fornecedor {
+  id                  String                @id @default(auto()) @map("_id") @db.ObjectId
+  razaoSocial         String
+  nomeFantasia        String
+  cnpj                String?               
+  email               String?
+  logradouro          String?
+  numImovel           String?
+  complemento         String?
+  bairro              String?
+  municipio           String?
+  uf                  String?
+  cep                 String?
+  telefone1           String?
+  telefone2           String?
+  categoria           String
+  createdAt           DateTime              @default(now())
+
+  usuarioId           String                @db.ObjectId
+  usuario             Usuario               @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  produtos            ProdutoFornecedor[]
+
+  @@index([usuarioId])
+  @@index([cnpj])
+  @@index([usuarioId, cnpj])
+}
+
+model ProdutoFornecedor {
+  id                    String        @id @default(auto()) @map("_id") @db.ObjectId
+
+  produtoId             String        @db.ObjectId
+  fornecedorId          String        @db.ObjectId
+
+  precoUltimaCompra     Float?
+
+  produto               Produto       @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  fornecedor            Fornecedor    @relation(fields: [fornecedorId], references: [id], onDelete: Cascade)
+
+  @@unique([produtoId, fornecedorId])
+  @@index([produtoId])
+  @@index([fornecedorId])
+}
+
+model Movimentacao {
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt         DateTime      @default(now())
+  quantidade        Int
+  justificativa     String
+
+  usuarioId         String        @db.ObjectId
+  usuario           Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  produtoId         String        @db.ObjectId
+  produto           Produto       @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  itemPedidoId      String?       @db.ObjectId
+  itemPedido        ItemPedido?   @relation(fields: [itemPedidoId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([produtoId])
+  @@index([createdAt])
+  @@index([usuarioId, createdAt])
+}
+
+model DispositivoPush {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  token       String   @unique
+  plataforma  String
+  provedor    String   @default("fcm")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  usuarioId   String   @db.ObjectId
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+}
+
+model DispositivoTelemetria {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  deviceId    String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  usuarioId   String   @db.ObjectId
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+}
+
+model Telemetria {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    deviceId    String
+    sensorType  String
+    value       Float
+    unit        String
+    measuredAt  DateTime
+    receivedAt  DateTime @default(now())
+
+    usuarioId   String?  @db.ObjectId
+    usuario     Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+    @@index([deviceId])
+    @@index([usuarioId])
+    @@index([sensorType])
+    @@index([measuredAt])
+    @@index([usuarioId, measuredAt])
+    @@index([deviceId, measuredAt])
+    @@index([deviceId, sensorType, measuredAt])
+  }

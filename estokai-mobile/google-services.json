@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "136244820653",
+    "project_id": "estokai-ed7f3",
+    "storage_bucket": "estokai-ed7f3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136244820653:android:5d944389fdeabefb16a424",
+        "android_client_info": {
+          "package_name": "com.estokai.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi7I_YyXHyo1x78vmluoHom_KDIgJ_5wY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

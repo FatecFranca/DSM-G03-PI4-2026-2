@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "author": "Estokai",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -89.2, "left": 297.8, "attrs": { "temperature": "24", "humidity": "40" } },
+    { "type": "wokwi-pushbutton", "id": "button1", "top": 134.4, "left": 278.4, "attrs": { "color": "green", "label": "S1" } },
+    { "type": "wokwi-pushbutton", "id": "button2", "top": 192, "left": 278.4, "attrs": { "color": "blue", "label": "S2" } },
+    { "type": "wokwi-hx711", "id": "hx7111", "top": 272.6, "left": 267.8, "attrs": {} },
+    { "type": "wokwi-hx711", "id": "hx7112", "top": 272.6, "left": 471.8, "attrs": {} },
+    { "type": "wokwi-hx711", "id": "hx7113", "top": 272.6, "left": 675.8, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:3V3", "dht1:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "dht1:GND", "black", [ "v0" ] ],
+    [ "esp:D4", "dht1:SDA", "green", [ "v0" ] ],
+    [ "esp:D18", "button1:1.l", "green", [ "v0" ] ],
+    [ "esp:GND.1", "button1:2.l", "black", [ "v0" ] ],
+    [ "esp:D27", "button2:1.l", "blue", [ "v0" ] ],
+    [ "esp:GND.1", "button2:2.l", "black", [ "v0" ] ],
+    [ "esp:3V3", "hx7111:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "hx7111:GND", "black", [ "v0" ] ],
+    [ "esp:D5", "hx7111:DT", "orange", [ "v0" ] ],
+    [ "esp:D23", "hx7111:SCK", "purple", [ "v0" ] ],
+    [ "esp:3V3", "hx7112:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "hx7112:GND", "black", [ "v0" ] ],
+    [ "esp:D19", "hx7112:DT", "orange", [ "v0" ] ],
+    [ "esp:D22", "hx7112:SCK", "purple", [ "v0" ] ],
+    [ "esp:3V3", "hx7113:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "hx7113:GND", "black", [ "v0" ] ],
+    [ "esp:D21", "hx7113:DT", "orange", [ "v0" ] ],
+    [ "esp:D25", "hx7113:SCK", "purple", [ "v0" ] ]
+  ],
+  "serialMonitor": { "display": "always", "newline": "lf" },
+  "dependencies": {}
+}

@@ -1,0 +1,14 @@
+{
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://158.23.60.48/api"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    }
+  }
+}

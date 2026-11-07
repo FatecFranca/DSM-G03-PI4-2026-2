@@ -1,0 +1,4 @@
+PubSubClient
+DHT sensor library for ESPx
+Adafruit Unified Sensor
+HX711 Arduino Library

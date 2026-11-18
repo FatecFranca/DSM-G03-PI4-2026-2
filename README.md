@@ -9,7 +9,7 @@ O **Estokai** é uma solução para gestão de estoque que reúne uma aplicaçã
 - Servidor: [158.23.60.48](http://158.23.60.48)
 - Aplicação web: [http://158.23.60.48/](158.23.60.48)
 - API: [http://158.23.60.48/api](158.23.60.48)
-- Vídeo de apresentação: **link a ser adicionado após a gravação**.
+- Vídeo de apresentação: [YouTube](https://youtu.be/lo7QFV9fBSI).
 
 
 ## Funcionalidades
